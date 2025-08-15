@@ -1,0 +1,382 @@
+{
+    // README.bjson - Better JSON Format Specification and Examples
+    // A human-readable, feature-rich alternative to standard JSON
+    
+    "project": {
+        "name": "Better JSON",
+        "version": "1.0.0",
+        "description": "Extended JSON format with comments, extended types, references, and flexible keys",
+        "author": "Better JSON Team",
+        "license": "MIT",
+        "created": @date(2024-01-15),
+        "lastUpdated": @datetime(2024-08-15T10:30:00Z),
+    },
+    
+    /* ==========================================
+     * CORE FEATURES
+     * ========================================== */
+    
+    "features": {
+        "comments": {
+            "singleLine": "// Like this",
+            "multiLine": /* "Like this too" */,
+            "description": "Full comment support for better documentation"
+        },
+        
+        "trailingCommas": {
+            "arrays": [
+                "item1",
+                "item2",  // trailing comma allowed
+            ],
+            "objects": {
+                "key1": "value1",
+                "key2": "value2",  // trailing comma allowed
+            },
+        },
+        
+        "extendedTypes": {
+            // Date and time types
+            "birthDate": @date(1990-05-15),
+            "appointmentTime": @datetime(2024-08-15T14:30:00-07:00),
+            "eventTime": @datetime(2024-12-25T00:00:00Z),
+            
+            // Binary data
+            "profilePicture": @bytes(base64:iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==),
+            "secretKey": @bytes(hex:deadbeef),
+            
+            // Collections
+            "uniqueIds": @set([1, 2, 3, 2, 1]), // automatically deduplicates to [1, 2, 3]
+            "preferences": @map({
+                "theme": "dark",
+                "language": "en",
+                42: "answer to everything",
+                true: "boolean key example",
+            }),
+            
+            // Regular expressions
+            "emailValidator": @regex(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/i),
+            "phonePattern": @regex(/^\+?1?-?\.?\s?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}$/),
+            
+            // References to other parts of the document
+            "userProfile": @ref($.users["john_doe"]),
+            "defaultSettings": @ref($.config.defaults),
+        },
+        
+        "flexibleKeys": {
+            // String keys (standard)
+            "userName": "john_doe",
+            
+            // Numeric keys
+            404: "Not Found",
+            200: "OK",
+            
+            // Boolean keys
+            true: "Enabled features",
+            false: "Disabled features",
+            
+            // Complex object keys
+            {"type": "error", "code": 500}: "Server error configuration",
+            {"x": 10, "y": 20}: "Coordinate-based data",
+        },
+    },
+    
+    /* ==========================================
+     * SYNTAX EXAMPLES
+     * ========================================== */
+    
+    "syntaxExamples": {
+        "basicDocument": {
+            "title": "My Document",
+            "version": 2.1,
+            "published": true,
+            "tags": ["documentation", "json", "format"],
+            "metadata": {
+                "wordCount": 1250,
+                "readingTime": @duration(PT5M30S), // 5 minutes 30 seconds
+            },
+        },
+        
+        "userDatabase": {
+            // Schema information embedded as type hints
+            "users": @type(Array<User>) [
+                {
+                    "$id": "user_001", // ID for referencing
+                    "name": "Alice Johnson",
+                    "email": "alice@example.com",
+                    "birthDate": @date(1985-03-22),
+                    "profileImage": @bytes(base64:R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7),
+                    "permissions": @set(["read", "write", "admin"]),
+                    "preferences": @map({
+                        "theme": "dark",
+                        "notifications": true,
+                        "language": "en-US",
+                    }),
+                    "lastLogin": @datetime(2024-08-15T09:15:30Z),
+                },
+                {
+                    "$id": "user_002",
+                    "name": "Bob Smith",
+                    "email": "bob@example.com",
+                    "birthDate": @date(1990-11-08),
+                    "manager": @ref($.users[0]), // Reference to Alice
+                    "permissions": @set(["read", "write"]),
+                    "lastLogin": @datetime(2024-08-14T16:22:45Z),
+                },
+            ],
+            
+            "roles": @type(Object<string, Role>) {
+                "admin": {
+                    "permissions": @set(["read", "write", "delete", "admin"]),
+                    "description": "Full system access",
+                },
+                "editor": {
+                    "permissions": @set(["read", "write"]),
+                    "description": "Content management access",
+                },
+                "viewer": {
+                    "permissions": @set(["read"]),
+                    "description": "Read-only access",
+                },
+            },
+        },
+        
+        "configurationFile": {
+            // Application configuration with type hints and comments
+            "database": {
+                "host": "localhost",
+                "port": 5432,
+                "name": "myapp_db",
+                "ssl": true,
+                "connectionPool": {
+                    "min": 5,
+                    "max": 20,
+                    "timeout": @duration(PT30S),
+                },
+                // Credentials reference external secure storage
+                "credentials": @ref($.secrets.database),
+            },
+            
+            "cache": {
+                "redis": {
+                    "host": "redis.example.com",
+                    "port": 6379,
+                    "ttl": @duration(PT1H), // 1 hour
+                },
+                "memory": {
+                    "maxSize": @bytes(mb:512), // 512 MB
+                    "evictionPolicy": "LRU",
+                },
+            },
+            
+            "logging": {
+                "level": "info",
+                "outputs": ["console", "file"],
+                "patterns": @map({
+                    "error": @regex(/ERROR|FATAL/i),
+                    "warning": @regex(/WARN/i),
+                    "debug": @regex(/DEBUG/i),
+                }),
+            },
+            
+            "secrets": {
+                "database": {
+                    "username": @encrypted("AES256:ZGF0YWJhc2VfdXNlcg=="),
+                    "password": @encrypted("AES256:cGFzc3dvcmQxMjM="),
+                },
+            },
+        },
+    },
+    
+    /* ==========================================
+     * SCHEMA AND VALIDATION
+     * ========================================== */
+    
+    "schemaExample": {
+        "$schema": "https://betterjson.org/schema/v1",
+        "type": "object",
+        "properties": {
+            "name": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 100,
+            },
+            "age": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 150,
+            },
+            "email": {
+                "type": "string",
+                "pattern": @regex(/^[^\s@]+@[^\s@]+\.[^\s@]+$/),
+            },
+            "tags": {
+                "type": "set",
+                "items": {"type": "string"},
+            },
+            "metadata": {
+                "type": "map",
+                "additionalProperties": true,
+            },
+        },
+        "required": ["name", "email"],
+    },
+    
+    /* ==========================================
+     * BINARY MODE SUPPORT
+     * ========================================== */
+    
+    "binaryMode": {
+        "description": "Better JSON supports efficient binary serialization",
+        "benefits": [
+            "Smaller file sizes",
+            "Faster parsing",
+            "Native binary data support",
+            "Preserves all extended types",
+        ],
+        "usage": {
+            "encoding": "BJSON-BIN-1.0",
+            "magic": @bytes(hex:424A534F4E), // "BJSON"
+            "compression": "optional",
+        },
+    },
+    
+    /* ==========================================
+     * ERROR HANDLING AND PARTIAL PARSING
+     * ========================================== */
+    
+    "errorHandling": {
+        "partialParsing": {
+            "description": "Parser continues on recoverable errors",
+            "example": {
+                "validField": "this parses fine",
+                "invalidField": /* syntax error here, but parser continues */,
+                "anotherValidField": "this also parses",
+            },
+            "errors": [
+                {
+                    "line": 2,
+                    "column": 15,
+                    "message": "Unexpected token ','",
+                    "severity": "error",
+                    "recoverable": true,
+                },
+            ],
+        },
+        
+        "referenceResolution": {
+            "description": "References are resolved after parsing",
+            "lazyResolution": true,
+            "circularReferences": "detected and handled",
+        },
+    },
+    
+    /* ==========================================
+     * IMPLEMENTATION NOTES
+     * ========================================== */
+    
+    "implementation": {
+        "parser": {
+            "language": "C",
+            "features": [
+                "Recursive descent parser",
+                "Error recovery",
+                "Memory efficient",
+                "Thread safe",
+            ],
+            "dependencies": ["regex.h", "time.h"],
+        },
+        
+        "performance": {
+            "parsing": "~2x slower than standard JSON (due to extended features)",
+            "serialization": "~1.5x slower than standard JSON",
+            "memory": "~20% more memory usage for extended types",
+        },
+        
+        "compatibility": {
+            "standardJSON": "100% backward compatible",
+            "jsonPath": "Extended for Better JSON references",
+            "tools": ["bjson-cli", "bjson-lint", "bjson-format"],
+        },
+    },
+    
+    /* ==========================================
+     * USAGE EXAMPLES
+     * ========================================== */
+    
+    "usage": {
+        "commandLine": {
+            "parse": "bjson parse input.bjson",
+            "validate": "bjson validate --schema schema.bjson input.bjson",
+            "format": "bjson format --pretty input.bjson",
+            "convert": "bjson convert --to json input.bjson output.json",
+        },
+        
+        "programmatic": {
+            "c": {
+                "parse": "bjson_value_t* value = bjson_parse(input, &error);",
+                "serialize": "char* output = bjson_serialize(value, pretty);",
+                "validate": "bjson_error_t err = bjson_validate_schema(value, schema);",
+            },
+            "bindings": ["Python", "JavaScript", "Rust", "Go"],
+        },
+    },
+    
+    /* ==========================================
+     * COMPARISON WITH STANDARD JSON
+     * ========================================== */
+    
+    "comparison": @map({
+        "Standard JSON": {
+            "comments": false,
+            "trailingCommas": false,
+            "extendedTypes": false,
+            "references": false,
+            "flexibleKeys": false,
+            "binaryData": "base64 strings only",
+            "dates": "strings only",
+        },
+        "Better JSON": {
+            "comments": true,
+            "trailingCommas": true,
+            "extendedTypes": true,
+            "references": true,
+            "flexibleKeys": true,
+            "binaryData": "native @bytes() type",
+            "dates": "native @date() and @datetime() types",
+        },
+    }),
+    
+    /* ==========================================
+     * MIGRATION GUIDE
+     * ========================================== */
+    
+    "migration": {
+        "fromJSON": {
+            "step1": "Rename .json files to .bjson",
+            "step2": "Add comments where helpful",
+            "step3": "Use extended types where appropriate",
+            "step4": "Add trailing commas for better diffs",
+            "compatibility": "Existing JSON is valid Better JSON",
+        },
+        
+        "tools": {
+            "converter": "bjson convert --from json input.json output.bjson",
+            "linter": "bjson lint --suggest-improvements input.bjson",
+            "formatter": "bjson format --upgrade input.bjson",
+        },
+    },
+    
+    // File metadata and references
+    "$metadata": {
+        "fileType": "Better JSON Documentation",
+        "version": "1.0.0",
+        "encoding": "UTF-8",
+        "generated": @datetime(2024-08-15T10:30:00Z),
+        "references": {
+            "specification": "https://betterjson.org/spec",
+            "repository": "https://github.com/betterjson/betterjson",
+            "examples": @ref($.syntaxExamples),
+        },
+        "checksum": @bytes(sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855),
+    },
+}
